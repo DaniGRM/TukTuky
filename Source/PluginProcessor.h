@@ -52,8 +52,19 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    void updateReadPosition(float delayTimeMs, double sampleRate);
 
 private:
+
+    juce::AudioBuffer<float> delayBuffer;
+    int delayBufferSize = 0;
+    int writePtr = 0;
+    int readPtr = 0;
+
+    int delayTimeSamples;
+    float delayTime = 500.f;
+    float feedback = 0.5f;
+    float mix = 0.5;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TukTukyAudioProcessor)
 };
