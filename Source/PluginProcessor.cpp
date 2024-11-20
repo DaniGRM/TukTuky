@@ -137,7 +137,6 @@ bool TukTukyAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 
 void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    DBG("PROCESS");
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
