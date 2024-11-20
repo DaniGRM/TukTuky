@@ -22,7 +22,7 @@ TukTukyAudioProcessor::TukTukyAudioProcessor()
                        )
 #endif
 {
-
+    
     delayBuffer.clear();
 }
 
@@ -95,11 +95,11 @@ void TukTukyAudioProcessor::changeProgramName (int index, const juce::String& ne
 //==============================================================================
 void TukTukyAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    delayBufferSize = static_cast<int>((2.0 /* segundos */) * getNumInputChannels() * getSampleRate());
+    delayBufferSize = static_cast<int>((2.0 /* segundos */) * getSampleRate());
 
     delayBuffer.setSize(2, delayBufferSize);
 
-    delayTimeSamples = static_cast<int>(delayTime * getSampleRate() * getNumInputChannels()/ 1000.0);
+    delayTimeSamples = static_cast<int>(delayTime * getSampleRate() / 1000.0);
     readPtr = (writePtr - delayTimeSamples + delayBufferSize) % delayBufferSize;
 }
 
@@ -159,33 +159,33 @@ void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+    int tempWritePtr;
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
         auto* delayData = delayBuffer.getWritePointer(channel);
-
+        tempWritePtr = writePtr;
         for (int sample = 0; sample < numSamples; sample++)
         {
-
-
             //int currentReadPosition = (writePtr - delayTimeSamples + delayBufferSize) % delayBufferSize;
+            readPtr = (tempWritePtr - delayTimeSamples + delayBufferSize) % delayBufferSize;
 
 
             // Recupera la muestra atrasada
             float delayedSample = delayData[readPtr];
 
             // Escribe en el buffer de delay con retroalimentación
-            delayData[writePtr] = channelData[sample] + feedback * delayedSample;
+            delayData[tempWritePtr] = channelData[sample] + feedback * delayedSample;
 
             // Mezcla la señal original y procesada
             channelData[sample] = (1.0f - mix) * channelData[sample] + mix * delayedSample;
 
             // Incrementa las posiciones de lectura y escritura de manera circular
-            writePtr = (writePtr + 1) % delayBufferSize;
-            readPtr = (writePtr - delayTimeSamples + delayBufferSize) % delayBufferSize;
+            tempWritePtr = (tempWritePtr + 1) % delayBufferSize;
         }
         // ..do something to the data...
     }
+    writePtr = tempWritePtr;
 }
 
 //==============================================================================
