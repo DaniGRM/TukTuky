@@ -99,7 +99,7 @@ void TukTukyAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
 
     delayBuffer.setSize(2, delayBufferSize);
 
-    delayTimeSamples = static_cast<int>(delayTime * getSampleRate() / 1000.0);
+    updateParams();
     readPtr = (writePtr - delayTimeSamples + delayBufferSize) % delayBufferSize;
 }
 
@@ -137,6 +137,7 @@ bool TukTukyAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) 
 
 void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    DBG("PROCESS");
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -152,6 +153,8 @@ void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+
+    updateParams();
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
@@ -211,8 +214,29 @@ void TukTukyAudioProcessor::setStateInformation (const void* data, int sizeInByt
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+
+    auto tree = juce::ValueTree::readFromData(data, sizeInBytes);
+    if (tree.isValid()) {
+        apvts.replaceState(tree);
+    }
 }
 
+juce::AudioProcessorValueTreeState::ParameterLayout TukTukyAudioProcessor::createParameterLayout() {
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Delay", "Delay", juce::NormalisableRange<float>(0.1f, 2.f, 0.1f, 1.f), 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Feedback", "Feedback", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Mix", "Mix", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 0.5f));
+
+    return layout;
+}
+
+void TukTukyAudioProcessor::updateParams() {
+    delayTime = apvts.getRawParameterValue("Delay")->load();
+    delayTimeSamples = static_cast<int>(delayTime * getSampleRate());
+    mix = apvts.getRawParameterValue("Mix")->load();
+    feedback = apvts.getRawParameterValue("Feedback")->load();
+}
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
