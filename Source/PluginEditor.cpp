@@ -8,79 +8,12 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
-    float sliderPosProportional, float rotaryStartAngle,
-    float rotaryEndAngle, juce::Slider& slider)
-{
-    using namespace juce;
-
-    auto bounds = Rectangle<float>(x, y, width, height);
-
-    g.setColour(Colours::whitesmoke);
-    g.fillEllipse(bounds);
-
-    g.setColour(Colour(24u, 45u, 100u));
-    g.drawEllipse(bounds, 2.f);
-
-    auto center = bounds.getCentre();
-    Path p;
-
-    Rectangle<float> r;
-    r.setLeft(center.getX() - 4);
-    r.setRight(center.getX() + 4);
-    r.setTop(bounds.getY() + 4);
-    r.setBottom(bounds.getY() + 12);
-
-    p.addEllipse(r);
-
-    jassert(rotaryStartAngle < rotaryEndAngle);
-
-    auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle);
-    p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY()));
-
-    g.fillPath(p);
-}
-
-void RotarySliderWithLabels::paint(juce::Graphics& g) {
-    using namespace juce;
-    auto startAng = degreesToRadians(180.f + 45.f);
-    auto endAng = degreesToRadians(180.f - 45.f) + MathConstants<float>::twoPi;
-
-    auto range = getRange();
-    auto sliderBounds = getSliderBounds();
-
-    getLookAndFeel().drawRotarySlider(g,
-        sliderBounds.getX(),
-        sliderBounds.getY(),
-        sliderBounds.getWidth(),
-        sliderBounds.getHeight(),
-        jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0),
-        startAng,
-        endAng,
-        *this);
-}
-
-juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const {
-
-    auto bounds = getLocalBounds();
-
-    auto size = juce::jmin(bounds.getWidth(), bounds.getHeight());
-
-    size -= getTextHeight() * 2;
-
-    juce::Rectangle<int> r;
-    r.setSize(size, size);
-    r.setCentre(bounds.getCentreX(), 0);
-    r.setY(2);
-
-    return r;
-}
 //==============================================================================
 TukTukyAudioProcessorEditor::TukTukyAudioProcessorEditor (TukTukyAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p),
-    delaySlider(*audioProcessor.apvts.getParameter("Delay"), "s"),
-    feedbackSlider(*audioProcessor.apvts.getParameter("Feedback"), ""),
-    mixSlider(*audioProcessor.apvts.getParameter("Mix"), ""),
+    delaySlider(*audioProcessor.apvts.getParameter("Delay")),
+    feedbackSlider(*audioProcessor.apvts.getParameter("Feedback")),
+    mixSlider(*audioProcessor.apvts.getParameter("Mix")),
     delaySliderAttachment(audioProcessor.apvts, "Delay", delaySlider),
     feedbackSliderAttachment(audioProcessor.apvts, "Feedback", feedbackSlider),
     mixSliderAttachment(audioProcessor.apvts, "Mix", mixSlider)
@@ -103,7 +36,7 @@ void TukTukyAudioProcessorEditor::paint (juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     using namespace juce;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll(Colours::whitesmoke);
+    g.fillAll(TukyUI::Colors::background);
 }
 
 void TukTukyAudioProcessorEditor::resized()
@@ -112,6 +45,12 @@ void TukTukyAudioProcessorEditor::resized()
     // subcomponents in your editor..
 
     auto bounds = getLocalBounds();
+
+    auto headerHeight = bounds.getHeight() * 0.1;
+
+    auto headerBounds = bounds.removeFromTop(headerHeight);
+    tukyHeader.setBounds(headerBounds);
+
     auto header = bounds.removeFromTop(bounds.getHeight() * 0.33);
 
     header.removeFromLeft(header.getWidth() * 0.33);
@@ -143,24 +82,27 @@ void TukTukyAudioProcessorEditor::resized()
     delayLabel.setBounds(delayLabelArea.withHeight(labelHeight).withY(firstArea.getBottom() - 20));
     delayLabel.setText("DELAY", juce::dontSendNotification);
     delayLabel.setJustificationType(juce::Justification::centred);
-    delayLabel.setColour(juce::Label::textColourId, juce::Colour(24u, 45u, 100u)); // Cambiar color del texto
+    delayLabel.setColour(juce::Label::textColourId, TukyUI::Colors::blue); // Cambiar color del textoo
+    delayLabel.setFont(TukyUI::Fonts::label); // Cambiar fuente del texto
 
     feedbackLabel.setBounds(feedbackLabelArea.withHeight(labelHeight).withY(secondArea.getBottom() - 20));
     feedbackLabel.setText("FEEDBACK", juce::dontSendNotification);
     feedbackLabel.setJustificationType(juce::Justification::centred);
-    feedbackLabel.setColour(juce::Label::textColourId, juce::Colour(24u, 45u, 100u));
+    feedbackLabel.setColour(juce::Label::textColourId, TukyUI::Colors::blue); // Cambiar color del textoo
+    feedbackLabel.setFont(TukyUI::Fonts::label); // Cambiar fuente del texto
 
     mixLabel.setBounds(mixLabelArea.withHeight(labelHeight).withY(bounds.getBottom() - 20));
     mixLabel.setText("MIX", juce::dontSendNotification);
     mixLabel.setJustificationType(juce::Justification::centred);
-    mixLabel.setColour(juce::Label::textColourId, juce::Colour(24u, 45u, 100u));
+    mixLabel.setColour(juce::Label::textColourId, TukyUI::Colors::blue); // Cambiar color del textoo
+    mixLabel.setFont(TukyUI::Fonts::label); // Cambiar fuente del texto
 
 
     titleLabel.setBounds(header);
-    titleLabel.setText("TukTuky", juce::dontSendNotification);
+    titleLabel.setText("TUKTUKY", juce::dontSendNotification);
     titleLabel.setJustificationType(juce::Justification::centred);
-    titleLabel.setColour(juce::Label::textColourId, juce::Colour(24u, 45u, 100u));
-    titleLabel.setFont(juce::Font(24.f, juce::Font::bold));
+    titleLabel.setColour(juce::Label::textColourId, TukyUI::Colors::blue);
+    titleLabel.setFont(TukyUI::Fonts::title);
 
 }
 
@@ -168,6 +110,7 @@ std::vector<juce::Component*> TukTukyAudioProcessorEditor::getComps()
 {
     return
     {
+        &tukyHeader,
         &delaySlider,
         &feedbackSlider,
         &mixSlider,
