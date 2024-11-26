@@ -22,7 +22,7 @@ TukTukyAudioProcessor::TukTukyAudioProcessor()
                        )
 #endif
 {
-    
+    // We clear the buffer to avoid interferences with trash samples
     delayBuffer.clear();
 }
 
@@ -95,12 +95,15 @@ void TukTukyAudioProcessor::changeProgramName (int index, const juce::String& ne
 //==============================================================================
 void TukTukyAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    // Set buffer size to 2 seconds
     delayBufferSize = static_cast<int>((2.0 /* segundos */) * getSampleRate());
-
     delayBuffer.setSize(2, delayBufferSize);
 
+    // Update params for the first iteration
     updateParams();
-    readPtr = (writePtr - delayTimeSamples + delayBufferSize) % delayBufferSize;
+
+    // We put the read pointer delay samples before for the first iteration
+    readPtr = (writePtr - static_cast<int>(delayTime * getSampleRate()) + delayBufferSize) % delayBufferSize;
 }
 
 void TukTukyAudioProcessor::releaseResources()
@@ -153,40 +156,39 @@ void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    // We call update params each block in case something has change
     updateParams();
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
+    // Temporal write pointe to keep the position at the beggining of this function
+    // This variable is very important to write the samples of each channel from the right position
     int tempWritePtr;
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
+
+        // For each channel we iterate through the samples 
         auto* channelData = buffer.getWritePointer (channel);
         auto* delayData = delayBuffer.getWritePointer(channel);
         tempWritePtr = writePtr;
         for (int sample = 0; sample < numSamples; sample++)
         {
-            //int currentReadPosition = (writePtr - delayTimeSamples + delayBufferSize) % delayBufferSize;
-            readPtr = (tempWritePtr - delayTimeSamples + delayBufferSize) % delayBufferSize;
+            //update read pointer position to make it be before writer
+            readPtr = (tempWritePtr - static_cast<int>(delayTime * getSampleRate()) + delayBufferSize) % delayBufferSize;
 
 
-            // Recupera la muestra atrasada
+            // Remember delayed sample
             float delayedSample = delayData[readPtr];
 
-            // Escribe en el buffer de delay con retroalimentación
+            // Write into delay buffer with feedback
             delayData[tempWritePtr] = channelData[sample] + feedback * delayedSample;
 
-            // Mezcla la señal original y procesada
+            // Mix original sample with delayed one
             channelData[sample] = (1.0f - mix) * channelData[sample] + mix * delayedSample;
 
-            // Incrementa las posiciones de lectura y escritura de manera circular
+            // Increase write pointer
             tempWritePtr = (tempWritePtr + 1) % delayBufferSize;
         }
-        // ..do something to the data...
     }
+    // At the end of each block we update write position with the temporal position value
     writePtr = tempWritePtr;
 }
 
@@ -230,9 +232,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout TukTukyAudioProcessor::creat
     return layout;
 }
 
+// In this function we only update params value if GUI has changed on some way
 void TukTukyAudioProcessor::updateParams() {
     delayTime = apvts.getRawParameterValue("Delay")->load();
-    delayTimeSamples = static_cast<int>(delayTime * getSampleRate());
     mix = apvts.getRawParameterValue("Mix")->load();
     feedback = apvts.getRawParameterValue("Feedback")->load();
 }

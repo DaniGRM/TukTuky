@@ -35,7 +35,7 @@
     <VS2022 targetFolder="Builds/VisualStudio2022" externalLibraries="TukyUI.lib">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="TukTuky" headerPath=".\TukyUI"
-                       libraryPath=".\TukyUI"/>
+                       libraryPath=".\TukyUI" enablePluginBinaryCopyStep="1" vst3BinaryLocation="C:\Program Files\Common Files\VST3"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="TukTuky"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

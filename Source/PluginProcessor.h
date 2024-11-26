@@ -54,21 +54,27 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     void updateReadPosition(float delayTimeMs, double sampleRate);
 
+    // Function to get parameter layout
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
+    // Parameters value tree
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 private:
 
+    //Delay buffer, delay buffer size
     juce::AudioBuffer<float> delayBuffer;
     int delayBufferSize = 0;
+
+    // Pointer to write and read
     int writePtr = 0;
     int readPtr = 0;
 
-    int delayTimeSamples;
+    // Params initialized
     float delayTime = 500.f;
     float feedback = 0.5f;
     float mix = 0.5;
 
+    // Function to update params
     void updateParams();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TukTukyAudioProcessor)
