@@ -62,28 +62,31 @@ private:
 
     void normalClicked()
     {
-        // Lógica para el evento onClick del ToggleButton
+        
         if (normalButton.getToggleState())
         {
-
+            // Normal ON -> SYNC OFF
             syncButton.setToggleState(false, true);
+            audioProcessor.setMode(audioProcessor.NORMAL_MODE);
         }
         else
         {
+            // Normal OFF -> SYNC ON
             syncButton.setToggleState(true, true);
+            audioProcessor.setMode(audioProcessor.SYNC_MODE);
         }
     }
 
     void syncClicked()
     {
-        // Lógica para el evento onClick del ToggleButton
         if (syncButton.getToggleState())
         {
-
+            // SYNC ON -> NORMAL OFF
             normalButton.setToggleState(false, true);
         }
         else
         {
+            // SYNC OFF -> NORMAL ON
             normalButton.setToggleState(true, true);
         }
     }

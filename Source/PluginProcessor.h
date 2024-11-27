@@ -59,6 +59,17 @@ public:
 
     // Parameters value tree
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+
+
+
+    const int NORMAL_MODE = 0;
+    const int SYNC_MODE = 1;
+    void setMode(int m) {
+        mode = m;
+
+        DBG("Mode:");
+        DBG(m);
+    }
 private:
 
     //Delay buffer, delay buffer size
@@ -73,6 +84,9 @@ private:
     float delayTime = 500.f;
     float feedback = 0.5f;
     float mix = 0.5;
+
+
+    int mode = NORMAL_MODE;
 
     // Function to update params
     void updateParams();
