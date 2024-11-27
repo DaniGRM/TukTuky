@@ -20,12 +20,17 @@ TukTukyAudioProcessorEditor::TukTukyAudioProcessorEditor (TukTukyAudioProcessor&
     mixSliderAttachment(audioProcessor.apvts, "Mix", mixSlider)
 {
 
+    normalButton.setButtonText("Normal");
+    normalButton.setToggleState(true, true);
+    syncButton.setButtonText("Sync");
+    normalButton.onClick = [this]() { normalClicked(); };
+    syncButton.onClick = [this]() { syncClicked(); };
     // Make all comps visible
     for (auto* comp : getComps()) {
         addAndMakeVisible(comp);
     }
     // Set size
-    setSize (600, 400);
+    setSize (600, 200);
 }
 
 TukTukyAudioProcessorEditor::~TukTukyAudioProcessorEditor()
@@ -46,29 +51,38 @@ void TukTukyAudioProcessorEditor::resized()
     auto bounds = getLocalBounds();
 
     // Header height
-    auto headerHeight = bounds.getHeight() * 0.1;
+    auto headerHeight = 40;
 
     // Header bounds
     auto headerBounds = bounds.removeFromTop(headerHeight);
     tukyHeader.setBounds(headerBounds);
 
-    int labelHeight = 30;
     // Rest area splitted into three horizontal areas
-    bounds.removeFromTop(bounds.getHeight() * 0.33 - labelHeight);
+
+
+    // AREA 1/3
     auto firstArea = bounds.removeFromLeft(bounds.getWidth() * 0.33);
-    auto secondArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
 
-    // Set bounds for each slider
+    auto modeArea = firstArea.removeFromBottom(firstArea.getHeight() * 0.25);
+    auto toggleHeight = 15.f;
+
+    modeArea.removeFromLeft(toggleHeight).removeFromRight(toggleHeight);
+    auto normalArea = modeArea.removeFromLeft(modeArea.getWidth() * 0.5);
+    normalButton.setBounds(normalArea.withHeight(toggleHeight).withY(normalArea.getY() + (normalArea.getHeight() - toggleHeight) / 2));
+    syncButton.setBounds(modeArea.withHeight(toggleHeight).withY(modeArea.getY() + (modeArea.getHeight() - toggleHeight) / 2));
+    setLabel(delayLabel, "DELAY", firstArea.removeFromTop(firstArea.getHeight() * 0.3));
     delaySlider.setBounds(firstArea);
+    
+    // AREA 2/3
+    auto secondArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
+    secondArea.removeFromBottom(secondArea.getHeight() * 0.25);
+    setLabel(feedbackLabel, "FEEDBACK", secondArea.removeFromTop(secondArea.getHeight() * 0.3));
     feedbackSlider.setBounds(secondArea);
+
+    // AREA 3/3
+    bounds.removeFromBottom(bounds.getHeight() * 0.25);
+    setLabel(mixLabel, "MIX", bounds.removeFromTop(bounds.getHeight() * 0.3));
     mixSlider.setBounds(bounds);
-
-    auto labelY = firstArea.getY() + delaySlider.getSliderBounds().getHeight() + labelHeight;
-
-    // Labels setted under each slider
-    setLabel(delayLabel, "DELAY", firstArea, labelHeight, labelY);
-    setLabel(feedbackLabel, "FEEDBACK", secondArea, labelHeight, labelY);
-    setLabel(mixLabel, "MIX", bounds, labelHeight, labelY);
 
 }
 
@@ -83,13 +97,15 @@ std::vector<juce::Component*> TukTukyAudioProcessorEditor::getComps()
         &mixSlider,
         &delayLabel,
         &feedbackLabel,
-        &mixLabel
+        &mixLabel,
+        &normalButton,
+        &syncButton
     };
 }
 
 // Function to set label with given text, on given bounds at given Y
-void TukTukyAudioProcessorEditor::setLabel(juce::Label& label, juce::String text, juce::Rectangle<int>bounds, int labelHeight, int labelY) {
-    label.setBounds(bounds.withHeight(labelHeight).withY(labelY));
+void TukTukyAudioProcessorEditor::setLabel(juce::Label& label, juce::String text, juce::Rectangle<int>bounds) {
+    label.setBounds(bounds);
     label.setText(text, juce::dontSendNotification);
     label.setJustificationType(juce::Justification::centred);
     label.setColour(juce::Label::textColourId, TukyUI::Colors::blue);

@@ -52,9 +52,41 @@ private:
         feedbackLabel,
         mixLabel;
 
+    //Toggle Buttons 
+    TukyUI::Components::TukyToggleButton normalButton, syncButton;
+
+
     // Internal function to get references of all components declared before
     std::vector<juce::Component*> getComps();
-    void setLabel(juce::Label& label, juce::String text, juce::Rectangle<int>bounds, int labelHeight, int labelY);
+    void setLabel(juce::Label& label, juce::String text, juce::Rectangle<int>bounds);
+
+    void normalClicked()
+    {
+        // Lógica para el evento onClick del ToggleButton
+        if (normalButton.getToggleState())
+        {
+
+            syncButton.setToggleState(false, true);
+        }
+        else
+        {
+            syncButton.setToggleState(true, true);
+        }
+    }
+
+    void syncClicked()
+    {
+        // Lógica para el evento onClick del ToggleButton
+        if (syncButton.getToggleState())
+        {
+
+            normalButton.setToggleState(false, true);
+        }
+        else
+        {
+            normalButton.setToggleState(true, true);
+        }
+    }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TukTukyAudioProcessorEditor)
 };
