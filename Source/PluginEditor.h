@@ -35,6 +35,7 @@ private:
 
     // Sliders for params
     TukyUI::Components::TukyRotarySlider delaySlider,
+        delaySyncSlider,
         feedbackSlider,
         mixSlider;
 
@@ -44,6 +45,7 @@ private:
 
     // Slider Attachment for sliders
     Attachment delaySliderAttachment,
+        delaySyncSliderAttachment,
         feedbackSliderAttachment,
         mixSliderAttachment;
 
@@ -68,12 +70,16 @@ private:
             // Normal ON -> SYNC OFF
             syncButton.setToggleState(false, true);
             audioProcessor.setMode(audioProcessor.NORMAL_MODE);
+            delaySlider.setVisible(true);
+            delaySyncSlider.setVisible(false);
         }
         else
         {
             // Normal OFF -> SYNC ON
             syncButton.setToggleState(true, true);
             audioProcessor.setMode(audioProcessor.SYNC_MODE);
+            delaySlider.setVisible(false);
+            delaySyncSlider.setVisible(true);
         }
     }
 

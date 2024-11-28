@@ -226,6 +226,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout TukTukyAudioProcessor::creat
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Delay", "Delay", juce::NormalisableRange<float>(0.1f, 2.f, 0.1f, 1.f), 0.5f));
+    layout.add(std::make_unique<juce::AudioParameterInt>("Delay Sync", "Delay Sync", 0, 6, 6));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Feedback", "Feedback", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Mix", "Mix", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 0.5f));
 
@@ -234,7 +235,27 @@ juce::AudioProcessorValueTreeState::ParameterLayout TukTukyAudioProcessor::creat
 
 // In this function we only update params value if GUI has changed on some way
 void TukTukyAudioProcessor::updateParams() {
-    delayTime = apvts.getRawParameterValue("Delay")->load();
+    switch (mode)
+    {
+    case 0:
+        delayTime = apvts.getRawParameterValue("Delay")->load();
+        break;
+    case 1:
+        if (auto* playHead = getPlayHead()) {
+            // Creamos una instancia para almacenar la posición
+            juce::AudioPlayHead::CurrentPositionInfo positionInfo;
+
+            // Obtenemos la información actual de posición
+            if (playHead->getCurrentPosition(positionInfo))
+            {
+                // Accedemos al BPM actual
+                auto bpm = positionInfo.bpm;
+                delayTime = bpm / 60.f * SYNC_FRAC[apvts.getRawParameterValue("Delay Sync")->load()];
+            }
+        }
+    default:
+        break;
+    }
     mix = apvts.getRawParameterValue("Mix")->load();
     feedback = apvts.getRawParameterValue("Feedback")->load();
 }

@@ -13,12 +13,19 @@ TukTukyAudioProcessorEditor::TukTukyAudioProcessorEditor (TukTukyAudioProcessor&
     : AudioProcessorEditor (&p), audioProcessor (p),
     tukyHeader("TukTuky"),
     delaySlider(*audioProcessor.apvts.getParameter("Delay")),
+    delaySyncSlider(*audioProcessor.apvts.getParameter("Delay Sync")),
     feedbackSlider(*audioProcessor.apvts.getParameter("Feedback")),
     mixSlider(*audioProcessor.apvts.getParameter("Mix")),
     delaySliderAttachment(audioProcessor.apvts, "Delay", delaySlider),
+    delaySyncSliderAttachment(audioProcessor.apvts, "Delay Sync", delaySyncSlider),
     feedbackSliderAttachment(audioProcessor.apvts, "Feedback", feedbackSlider),
     mixSliderAttachment(audioProcessor.apvts, "Mix", mixSlider)
 {
+
+    delaySlider.setMarks({"0.1s", "2s"});
+    delaySyncSlider.setMarks({"1/16", "1/8", "1/6", "1/4", "1/3", "1/2", "1"});
+    feedbackSlider.setMarks({"0", "1"});
+    mixSlider.setMarks({"0", "1"});
 
     normalButton.setButtonText("Normal");
     normalButton.setToggleState(true, true);
@@ -29,8 +36,10 @@ TukTukyAudioProcessorEditor::TukTukyAudioProcessorEditor (TukTukyAudioProcessor&
     for (auto* comp : getComps()) {
         addAndMakeVisible(comp);
     }
+
+    delaySyncSlider.setVisible(false);
     // Set size
-    setSize (600, 200);
+    setSize (600, 300);
 }
 
 TukTukyAudioProcessorEditor::~TukTukyAudioProcessorEditor()
@@ -72,6 +81,7 @@ void TukTukyAudioProcessorEditor::resized()
     syncButton.setBounds(modeArea.withHeight(toggleHeight).withY(modeArea.getY() + (modeArea.getHeight() - toggleHeight) / 2));
     setLabel(delayLabel, "DELAY", firstArea.removeFromTop(firstArea.getHeight() * 0.3));
     delaySlider.setBounds(firstArea);
+    delaySyncSlider.setBounds(firstArea);
     
     // AREA 2/3
     auto secondArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
@@ -93,6 +103,7 @@ std::vector<juce::Component*> TukTukyAudioProcessorEditor::getComps()
     {
         &tukyHeader,
         &delaySlider,
+        &delaySyncSlider,
         &feedbackSlider,
         &mixSlider,
         &delayLabel,
