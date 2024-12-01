@@ -81,7 +81,44 @@ public:
         updateParams();
     }
 private:
+    float ramp(int channel, int x) {
 
+        int td = static_cast<int>(delayTime * getSampleRate());
+
+        float y;
+        if (channel == pingPongChannel)// ACTIVE CHANNEL
+        {
+            if (x < (td / 2))
+            {
+      
+                y = 0.5f + (static_cast<float>(x) / td);
+            }
+            else
+            {
+                y = 1.5f - (static_cast<float>(x) / td);
+            }
+        }
+        else// INACTIVE CHANNEL
+        {
+            if (x < (td / 2))
+            {
+                y = 0.5f - (static_cast<float>(x) / td);
+            }
+            else
+            {
+                y = 0.5f * (static_cast<float>(2 * x - td ) / td);
+            }
+        }
+
+        if (y > 1.0f) {
+            return 1.0f;
+        }
+
+        if (y < 0.0f) {
+            return 0.0f;
+        }
+        return y;
+    }
     //Delay buffer, delay buffer size
     juce::AudioBuffer<float> delayBuffer;
     int delayBufferSize = 0;
@@ -97,7 +134,8 @@ private:
 
 
     int mode = NORMAL_MODE;
-
+    int pingPongChannel = 0;
+    int pingPongCount = 0;
     // Function to update params
     void updateParams();
     //==============================================================================
