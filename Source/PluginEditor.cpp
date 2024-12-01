@@ -30,8 +30,10 @@ TukTukyAudioProcessorEditor::TukTukyAudioProcessorEditor (TukTukyAudioProcessor&
     normalButton.setButtonText("Normal");
     normalButton.setToggleState(true, true);
     syncButton.setButtonText("Sync");
+    pingPongButton.setButtonText("PingPong");
     normalButton.onClick = [this]() { normalClicked(); };
     syncButton.onClick = [this]() { syncClicked(); };
+    pingPongButton.onClick = [this]() { pingPongClicked(); };
     // Make all comps visible
     for (auto* comp : getComps()) {
         addAndMakeVisible(comp);
@@ -85,7 +87,14 @@ void TukTukyAudioProcessorEditor::resized()
     
     // AREA 2/3
     auto secondArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
-    secondArea.removeFromBottom(secondArea.getHeight() * 0.25);
+
+
+    auto pArea = secondArea.removeFromBottom(secondArea.getHeight() * 0.25);
+
+    pArea.removeFromLeft(toggleHeight).removeFromRight(toggleHeight);
+    auto pingArea = pArea.removeFromLeft(pArea.getWidth() * 0.5);
+    pingPongButton.setBounds(pingArea.withHeight(toggleHeight).withY(pingArea.getY() + (pingArea.getHeight() - toggleHeight) / 2));
+    //secondArea.removeFromBottom(secondArea.getHeight() * 0.25);
     setLabel(feedbackLabel, "FEEDBACK", secondArea.removeFromTop(secondArea.getHeight() * 0.3));
     feedbackSlider.setBounds(secondArea);
 
@@ -110,7 +119,8 @@ std::vector<juce::Component*> TukTukyAudioProcessorEditor::getComps()
         &feedbackLabel,
         &mixLabel,
         &normalButton,
-        &syncButton
+        &syncButton,
+        &pingPongButton,
     };
 }
 

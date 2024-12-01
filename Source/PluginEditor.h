@@ -55,7 +55,7 @@ private:
         mixLabel;
 
     //Toggle Buttons 
-    TukyUI::Components::TukyToggleButton normalButton, syncButton;
+    TukyUI::Components::TukyToggleButton normalButton, syncButton, pingPongButton;
 
 
     // Internal function to get references of all components declared before
@@ -94,6 +94,18 @@ private:
         {
             // SYNC OFF -> NORMAL ON
             normalButton.setToggleState(true, true);
+        }
+    }
+
+    void pingPongClicked()
+    {
+        if (pingPongButton.getToggleState())
+        {
+            audioProcessor.setPingPong(true);
+        }
+        else
+        {
+            audioProcessor.setPingPong(false);
         }
     }
 

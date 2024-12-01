@@ -80,6 +80,10 @@ public:
         mode = m;
         updateParams();
     }
+
+    void setPingPong(bool set) {
+        pingPong = set;
+    }
 private:
     float ramp(int channel, int x) {
 
@@ -134,8 +138,11 @@ private:
 
 
     int mode = NORMAL_MODE;
+
+
     int pingPongChannel = 0;
     int pingPongCount = 0;
+    bool pingPong = false;
     // Function to update params
     void updateParams();
     //==============================================================================

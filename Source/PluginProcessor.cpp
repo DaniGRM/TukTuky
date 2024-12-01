@@ -192,44 +192,46 @@ void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     //// At the end of each block we update write position with the temporal position value
     //writePtr = tempWritePtr;
 
-    int tempWritePtrLeft = writePtr;
-    int tempWritePtrRight = writePtr;
+    int tempWritePtr = writePtr;
 
-    auto* leftChannelData = buffer.getWritePointer(0);
-    auto* rightChannelData = buffer.getWritePointer(1);
-    auto* delayDataLeft = delayBuffer.getWritePointer(0);
-    auto* delayDataRight = delayBuffer.getWritePointer(1);
+
+    juce::Array<float*> channelData = { buffer.getWritePointer(0), buffer.getWritePointer(1) };
+    juce::Array<float*> delayData = { delayBuffer.getWritePointer(0) , delayBuffer.getWritePointer(1) };
 
     for (int sample = 0; sample < numSamples; ++sample)
     {
-        // Calcular posiciones de lectura para ambos canales
-        int readPtrLeft = (tempWritePtrLeft - static_cast<int>(delayTime * getSampleRate()) + delayBufferSize) % delayBufferSize;
-        int readPtrRight = (tempWritePtrRight - static_cast<int>(delayTime * getSampleRate()) + delayBufferSize) % delayBufferSize;
 
-        // Recuperar muestras atrasadas
-        float delayedSampleLeft = delayDataLeft[readPtrLeft];
-        float delayedSampleRight = delayDataRight[readPtrRight];
 
-        
-        // Escribir en los buffers de delay con retroalimentación cruzada
-        delayDataLeft[tempWritePtrLeft] = leftChannelData[sample] + feedback * delayedSampleRight;
-        delayDataRight[tempWritePtrRight] = rightChannelData[sample] + feedback * delayedSampleLeft;
-        leftChannelData[sample] = (1.0f - mix) * leftChannelData[sample] + mix * delayedSampleLeft * ramp(0, pingPongCount);
-        rightChannelData[sample] = (1.0f - mix) * rightChannelData[sample] + mix * delayedSampleRight * ramp(1, pingPongCount);
+        for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+            // Calcular posiciones de lectura para ambos canales
+            int readPtr = (tempWritePtr - static_cast<int>(delayTime * getSampleRate()) + delayBufferSize) % delayBufferSize;
+
+            // Recuperar muestras atrasadas
+            float delayedSample = delayData[channel][readPtr];
+
+
+            // Escribir en los buffers de delay con retroalimentación cruzada
+            delayData[channel][tempWritePtr] = channelData[channel][sample] + feedback * delayedSample;
+            if (pingPong) {
+                delayedSample *= ramp(channel, pingPongCount);
+            }
+            channelData[channel][sample] = (1.0f - mix) * channelData[channel][sample] + mix * delayedSample;
+
+        }
 
         pingPongCount++;
         if (pingPongCount >= static_cast<int>(delayTime * getSampleRate())) {
             pingPongChannel = 1 - pingPongChannel;
             pingPongCount = 0;
         }
-        
+
         // Incrementar los punteros de lectura/escritura de manera circular
-        tempWritePtrLeft = (tempWritePtrLeft + 1) % delayBufferSize;
-        tempWritePtrRight = (tempWritePtrRight + 1) % delayBufferSize;
+        tempWritePtr = (tempWritePtr + 1) % delayBufferSize;
+        
     }
 
     // Actualizar puntero global de escritura
-    writePtr = tempWritePtrLeft; //
+    writePtr = tempWritePtr; //
 }
 
 //==============================================================================
