@@ -36,7 +36,9 @@
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="TukTuky" headerPath=".\TukyUI"
                        libraryPath=".\TukyUI" enablePluginBinaryCopyStep="1" vst3BinaryLocation="C:\Program Files\Common Files\VST3"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="TukTuky"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="TukTuky" headerPath=".\TukyUI_Release"
+                       libraryPath=".\TukyUI_Release" enablePluginBinaryCopyStep="1"
+                       vst3BinaryLocation="C:\Program Files\Common Files\VST3"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../Documents/JUCE/JUCE/modules"/>

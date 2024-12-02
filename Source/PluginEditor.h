@@ -55,45 +55,28 @@ private:
         mixLabel;
 
     //Toggle Buttons 
-    TukyUI::Components::TukyToggleButton normalButton, syncButton, pingPongButton;
+    TukyUI::Components::TukyToggleButton syncButton, pingPongButton;
 
 
     // Internal function to get references of all components declared before
     std::vector<juce::Component*> getComps();
     void setLabel(juce::Label& label, juce::String text, juce::Rectangle<int>bounds);
 
-    void normalClicked()
-    {
-        
-        if (normalButton.getToggleState())
-        {
-            // Normal ON -> SYNC OFF
-            syncButton.setToggleState(false, true);
-            audioProcessor.setMode(audioProcessor.NORMAL_MODE);
-            delaySlider.setVisible(true);
-            delaySyncSlider.setVisible(false);
-        }
-        else
-        {
-            // Normal OFF -> SYNC ON
-            syncButton.setToggleState(true, true);
-            audioProcessor.setMode(audioProcessor.SYNC_MODE);
-            delaySlider.setVisible(false);
-            delaySyncSlider.setVisible(true);
-        }
-    }
-
     void syncClicked()
     {
         if (syncButton.getToggleState())
         {
             // SYNC ON -> NORMAL OFF
-            normalButton.setToggleState(false, true);
+            audioProcessor.setMode(audioProcessor.SYNC_MODE);
+            delaySlider.setVisible(false);
+            delaySyncSlider.setVisible(true);
         }
         else
         {
             // SYNC OFF -> NORMAL ON
-            normalButton.setToggleState(true, true);
+            audioProcessor.setMode(audioProcessor.NORMAL_MODE);
+            delaySlider.setVisible(true);
+            delaySyncSlider.setVisible(false);
         }
     }
 

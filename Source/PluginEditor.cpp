@@ -27,11 +27,8 @@ TukTukyAudioProcessorEditor::TukTukyAudioProcessorEditor (TukTukyAudioProcessor&
     feedbackSlider.setMarks({"0", "1"});
     mixSlider.setMarks({"0", "1"});
 
-    normalButton.setButtonText("Normal");
-    normalButton.setToggleState(true, true);
     syncButton.setButtonText("Sync");
     pingPongButton.setButtonText("PingPong");
-    normalButton.onClick = [this]() { normalClicked(); };
     syncButton.onClick = [this]() { syncClicked(); };
     pingPongButton.onClick = [this]() { pingPongClicked(); };
     // Make all comps visible
@@ -70,31 +67,26 @@ void TukTukyAudioProcessorEditor::resized()
 
     // Rest area splitted into three horizontal areas
 
+    auto toggleHeight = 15.f;
 
     // AREA 1/3
     auto firstArea = bounds.removeFromLeft(bounds.getWidth() * 0.33);
-
     auto modeArea = firstArea.removeFromBottom(firstArea.getHeight() * 0.25);
-    auto toggleHeight = 15.f;
 
     modeArea.removeFromLeft(toggleHeight).removeFromRight(toggleHeight);
-    auto normalArea = modeArea.removeFromLeft(modeArea.getWidth() * 0.5);
-    normalButton.setBounds(normalArea.withHeight(toggleHeight).withY(normalArea.getY() + (normalArea.getHeight() - toggleHeight) / 2));
-    syncButton.setBounds(modeArea.withHeight(toggleHeight).withY(modeArea.getY() + (modeArea.getHeight() - toggleHeight) / 2));
+    auto syncArea = modeArea.removeFromLeft(modeArea.getWidth() * 0.5);
+    syncButton.setBounds(syncArea.withHeight(toggleHeight).withY(syncArea.getY() + (syncArea.getHeight() - toggleHeight) / 2));
     setLabel(delayLabel, "DELAY", firstArea.removeFromTop(firstArea.getHeight() * 0.3));
     delaySlider.setBounds(firstArea);
     delaySyncSlider.setBounds(firstArea);
     
     // AREA 2/3
     auto secondArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
-
-
     auto pArea = secondArea.removeFromBottom(secondArea.getHeight() * 0.25);
 
     pArea.removeFromLeft(toggleHeight).removeFromRight(toggleHeight);
     auto pingArea = pArea.removeFromLeft(pArea.getWidth() * 0.5);
     pingPongButton.setBounds(pingArea.withHeight(toggleHeight).withY(pingArea.getY() + (pingArea.getHeight() - toggleHeight) / 2));
-    //secondArea.removeFromBottom(secondArea.getHeight() * 0.25);
     setLabel(feedbackLabel, "FEEDBACK", secondArea.removeFromTop(secondArea.getHeight() * 0.3));
     feedbackSlider.setBounds(secondArea);
 
@@ -118,7 +110,6 @@ std::vector<juce::Component*> TukTukyAudioProcessorEditor::getComps()
         &delayLabel,
         &feedbackLabel,
         &mixLabel,
-        &normalButton,
         &syncButton,
         &pingPongButton,
     };
