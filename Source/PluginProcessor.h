@@ -143,6 +143,9 @@ private:
     int pingPongChannel = 0;
     int pingPongCount = 0;
     bool pingPong = false;
+
+    juce::IIRFilter lowPassFilter[2];
+    juce::IIRFilter highPassFilter[2];
     // Function to update params
     void updateParams();
     //==============================================================================

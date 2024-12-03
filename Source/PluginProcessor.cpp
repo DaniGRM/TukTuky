@@ -23,6 +23,8 @@ TukTukyAudioProcessor::TukTukyAudioProcessor()
 #endif
 {
     // We clear the buffer to avoid interferences with trash samples
+
+
     delayBuffer.clear();
 }
 
@@ -95,6 +97,12 @@ void TukTukyAudioProcessor::changeProgramName (int index, const juce::String& ne
 //==============================================================================
 void TukTukyAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+
+    for (int channel = 0; channel < 2; ++channel)
+    {
+        lowPassFilter[channel].setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 1000.f)); // Frecuencia de corte de 1000 Hz
+        highPassFilter[channel].setCoefficients(juce::IIRCoefficients::makeHighPass(sampleRate, 15000.f)); // Frecuencia de corte de 1000 Hz
+    }
     // Set buffer size to 2 seconds
     delayBufferSize = static_cast<int>((2.0 /* segundos */) * getSampleRate());
     delayBuffer.setSize(2, delayBufferSize);
@@ -160,35 +168,6 @@ void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     // We call update params each block in case something has change
     updateParams();
 
-    // Temporal write pointe to keep the position at the beggining of this function
-    // This variable is very important to write the samples of each channel from the right position
-    //int tempWritePtr;
-    //for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    //{
-
-    //    // For each channel we iterate through the samples 
-    //    auto* channelData = buffer.getWritePointer (channel);
-    //    auto* delayData = delayBuffer.getWritePointer(channel);
-    //    tempWritePtr = writePtr;
-    //    for (int sample = 0; sample < numSamples; sample++)
-    //    {
-    //        //update read pointer position to make it be before writer
-    //        readPtr = (tempWritePtr - static_cast<int>(delayTime * getSampleRate()) + delayBufferSize) % delayBufferSize;
-
-
-    //        // Remember delayed sample
-    //        float delayedSample = delayData[readPtr];
-
-    //        // Write into delay buffer with feedback
-    //        delayData[tempWritePtr] = channelData[sample] + feedback * delayedSample;
-
-    //        // Mix original sample with delayed one
-    //        channelData[sample] = (1.0f - mix) * channelData[sample] + mix * delayedSample;
-
-    //        // Increase write pointer
-    //        tempWritePtr = (tempWritePtr + 1) % delayBufferSize;
-    //    }
-    //}
     //// At the end of each block we update write position with the temporal position value
     //writePtr = tempWritePtr;
 
@@ -210,12 +189,18 @@ void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
             float delayedSample = delayData[channel][readPtr];
 
 
+            float lowFilteredSample = lowPassFilter[channel].processSingleSampleRaw(delayedSample);
+
+            float filterMix = 0.f;
+            // Mezclar la muestra original de delay con la filtrada según el parámetro "filterAmount"
+            float finalDelayedSample = (1.0f - filterMix) * delayedSample + filterMix * lowFilteredSample;
+
             // Escribir en los buffers de delay con retroalimentación cruzada
-            delayData[channel][tempWritePtr] = channelData[channel][sample] + feedback * delayedSample;
+            delayData[channel][tempWritePtr] = channelData[channel][sample] + feedback * finalDelayedSample;
             if (pingPong) {
-                delayedSample *= ramp(channel, pingPongCount);
+                finalDelayedSample *= ramp(channel, pingPongCount);
             }
-            channelData[channel][sample] = (1.0f - mix) * channelData[channel][sample] + mix * delayedSample;
+            channelData[channel][sample] = (1.0f - mix) * channelData[channel][sample] + mix * finalDelayedSample;
 
         }
 
