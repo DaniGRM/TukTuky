@@ -37,7 +37,11 @@ private:
     TukyUI::Components::TukyRotarySlider delaySlider,
         delaySyncSlider,
         feedbackSlider,
-        mixSlider;
+        lowCutSlider,
+        highCutSlider,
+        mixFilterSlider,
+        mixSlider,
+        gainSlider;
 
     // Usings to make code more readable
     using APVTS = juce::AudioProcessorValueTreeState;
@@ -52,7 +56,11 @@ private:
     // Labels for sliders
     juce::Label delayLabel,
         feedbackLabel,
-        mixLabel;
+        mixLabel,
+        lowCutLabel,
+        highCutLabel,
+        mixFilterLabel,
+        gainLabel;
 
     //Toggle Buttons 
     TukyUI::Components::TukyToggleButton syncButton, pingPongButton;
