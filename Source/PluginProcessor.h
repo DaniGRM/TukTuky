@@ -135,6 +135,7 @@ private:
     float delayTime = 500.f;
     float feedback = 0.5f;
     float mix = 0.5;
+    float gain = 1.f;
 
     float lowFreq = 20.f;
     float highFreq = 20000.f;

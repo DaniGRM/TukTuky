@@ -54,6 +54,7 @@ private:
         lowCutSliderAttachment,
         highCutSliderAttachment,
         mixFilterSliderAttachment,
+        gainSliderAttachment,
         mixSliderAttachment;
 
     // Labels for sliders

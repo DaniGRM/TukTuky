@@ -24,6 +24,7 @@ TukTukyAudioProcessorEditor::TukTukyAudioProcessorEditor (TukTukyAudioProcessor&
     delaySyncSliderAttachment(audioProcessor.apvts, "Delay Sync", delaySyncSlider),
     feedbackSliderAttachment(audioProcessor.apvts, "Feedback", feedbackSlider),
     mixSliderAttachment(audioProcessor.apvts, "Mix", mixSlider),
+    gainSliderAttachment(audioProcessor.apvts, "Gain", gainSlider),
     lowCutSliderAttachment(audioProcessor.apvts, "Low Freq", lowCutSlider),
     highCutSliderAttachment(audioProcessor.apvts, "High Freq", highCutSlider),
     mixFilterSliderAttachment(audioProcessor.apvts, "Filter Mix", mixFilterSlider)
@@ -128,21 +129,14 @@ void TukTukyAudioProcessorEditor::resized()
     auto lowLabelArea = lowArea.removeFromRight(lowArea.getWidth() * 0.5f);
     auto highLabelArea = highArea.removeFromLeft(highArea.getWidth() * 0.5f);
     auto filterLabelArea = secondArea.removeFromRight(secondArea.getWidth() * 0.5f);
-    /*setLabel(lowCutLabel, "LOW CUT", lowLabelArea.withY(lowLabelArea.getY() - lowLabelArea.getHeight() * 0.5f + 7.f));
+    setLabel(lowCutLabel, "LOW CUT", lowLabelArea.withY(lowLabelArea.getY() - lowLabelArea.getHeight() * 0.5f + 7.f));
     setLabel(highCutLabel, "HIGH CUT", highLabelArea.withY(highLabelArea.getY() - highLabelArea.getHeight() * 0.5f + 7.f));
-    setLabel(mixFilterLabel, "FILTER", filterLabelArea.withY(filterLabelArea.getY() -  filterLabelArea.getHeight() * 0.5f + 7.f));*/
+    setLabel(mixFilterLabel, "FILTER", filterLabelArea.withY(filterLabelArea.getY() -  filterLabelArea.getHeight() * 0.5f + 7.f));
 
 
     lowCutSlider.setBounds(lowArea);
     highCutSlider.setBounds(highArea);
     mixFilterSlider.setBounds(secondArea);
-    //auto pArea = secondArea.removeFromBottom(secondArea.getHeight() * 0.25);
-
-    //pArea.removeFromLeft(toggleHeight).removeFromRight(toggleHeight);
-    //auto pingArea = pArea.removeFromLeft(pArea.getWidth() * 0.5);
-    //pingPongButton.setBounds(pingArea.withHeight(toggleHeight).withY(pingArea.getY() + (pingArea.getHeight() - toggleHeight) / 2));
-    //setLabel(feedbackLabel, "FEEDBACK", secondArea.removeFromTop(secondArea.getHeight() * 0.3));
-    //feedbackSlider.setBounds(secondArea);
 
     // AREA 3/3
     bounds.removeFromBottom(bounds.getHeight() * 0.2);
@@ -154,13 +148,6 @@ void TukTukyAudioProcessorEditor::resized()
     auto mixArea = bounds.removeFromTop(bounds.getHeight() * 0.88);
     mixSlider.setBounds(mixArea);
     setLabel(mixLabel, "MIX", bounds);
-
-
-
-    //bounds.removeFromBottom(bounds.getHeight() * 0.25);
-    //setLabel(mixLabel, "MIX", bounds.removeFromTop(bounds.getHeight() * 0.3));
-    //mixSlider.setBounds(bounds);
-
 }
 
 // Function to get reference for each component
