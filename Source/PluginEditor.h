@@ -51,6 +51,9 @@ private:
     Attachment delaySliderAttachment,
         delaySyncSliderAttachment,
         feedbackSliderAttachment,
+        lowCutSliderAttachment,
+        highCutSliderAttachment,
+        mixFilterSliderAttachment,
         mixSliderAttachment;
 
     // Labels for sliders

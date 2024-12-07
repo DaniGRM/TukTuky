@@ -98,11 +98,7 @@ void TukTukyAudioProcessor::changeProgramName (int index, const juce::String& ne
 void TukTukyAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
 
-    for (int channel = 0; channel < 2; ++channel)
-    {
-        lowPassFilter[channel].setCoefficients(juce::IIRCoefficients::makeLowPass(sampleRate, 1000.f)); // Frecuencia de corte de 1000 Hz
-        highPassFilter[channel].setCoefficients(juce::IIRCoefficients::makeHighPass(sampleRate, 15000.f)); // Frecuencia de corte de 1000 Hz
-    }
+
     // Set buffer size to 2 seconds
     delayBufferSize = static_cast<int>((2.0 /* segundos */) * getSampleRate());
     delayBuffer.setSize(2, delayBufferSize);
@@ -191,9 +187,10 @@ void TukTukyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
 
             float lowFilteredSample = lowPassFilter[channel].processSingleSampleRaw(delayedSample);
 
-            float filterMix = 0.f;
+
+            float highFilteredSample = highPassFilter[channel].processSingleSampleRaw(lowFilteredSample);
             // Mezclar la muestra original de delay con la filtrada según el parámetro "filterAmount"
-            float finalDelayedSample = (1.0f - filterMix) * delayedSample + filterMix * lowFilteredSample;
+            float finalDelayedSample = (1.0f - filterMix) * delayedSample + filterMix * highFilteredSample;
 
             // Escribir en los buffers de delay con retroalimentación cruzada
             delayData[channel][tempWritePtr] = channelData[channel][sample] + feedback * finalDelayedSample;
@@ -257,6 +254,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout TukTukyAudioProcessor::creat
     layout.add(std::make_unique<juce::AudioParameterFloat>("Feedback", "Feedback", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 0.5f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Mix", "Mix", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 0.5f));
 
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Low Freq", "Low Freq", juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 0.1f), 20.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("High Freq", "High Freq", juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 0.1f), 20000.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Filter Mix", "Filter Mix", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 0.f));
+
     return layout;
 }
 
@@ -282,6 +284,16 @@ void TukTukyAudioProcessor::updateParams() {
         }
     default:
         break;
+    }
+
+    filterMix = apvts.getRawParameterValue("Filter Mix")->load();
+    lowFreq = apvts.getRawParameterValue("Low Freq")->load();
+    highFreq = apvts.getRawParameterValue("High Freq")->load();
+
+    for (int channel = 0; channel < 2; ++channel)
+    {
+        lowPassFilter[channel].setCoefficients(juce::IIRCoefficients::makeHighPass(getSampleRate(), lowFreq)); // Frecuencia de corte de 1000 Hz
+        highPassFilter[channel].setCoefficients(juce::IIRCoefficients::makeLowPass(getSampleRate(), highFreq)); // Frecuencia de corte de 1000 Hz
     }
     mix = apvts.getRawParameterValue("Mix")->load();
     feedback = apvts.getRawParameterValue("Feedback")->load();

@@ -136,6 +136,10 @@ private:
     float feedback = 0.5f;
     float mix = 0.5;
 
+    float lowFreq = 20.f;
+    float highFreq = 20000.f;
+    float filterMix = 0.f;
+
 
     int mode = NORMAL_MODE;
 

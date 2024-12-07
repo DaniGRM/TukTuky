@@ -15,15 +15,18 @@ TukTukyAudioProcessorEditor::TukTukyAudioProcessorEditor (TukTukyAudioProcessor&
     delaySlider(*audioProcessor.apvts.getParameter("Delay")),
     delaySyncSlider(*audioProcessor.apvts.getParameter("Delay Sync")),
     feedbackSlider(*audioProcessor.apvts.getParameter("Feedback")),
-    lowCutSlider(*audioProcessor.apvts.getParameter("Feedback")),
-    highCutSlider(*audioProcessor.apvts.getParameter("Feedback")),
-    mixFilterSlider(*audioProcessor.apvts.getParameter("Feedback")),
+    lowCutSlider(*audioProcessor.apvts.getParameter("Low Freq")),
+    highCutSlider(*audioProcessor.apvts.getParameter("High Freq")),
+    mixFilterSlider(*audioProcessor.apvts.getParameter("Filter Mix")),
     mixSlider(*audioProcessor.apvts.getParameter("Mix")),
     gainSlider(*audioProcessor.apvts.getParameter("Mix")),
     delaySliderAttachment(audioProcessor.apvts, "Delay", delaySlider),
     delaySyncSliderAttachment(audioProcessor.apvts, "Delay Sync", delaySyncSlider),
     feedbackSliderAttachment(audioProcessor.apvts, "Feedback", feedbackSlider),
-    mixSliderAttachment(audioProcessor.apvts, "Mix", mixSlider)
+    mixSliderAttachment(audioProcessor.apvts, "Mix", mixSlider),
+    lowCutSliderAttachment(audioProcessor.apvts, "Low Freq", lowCutSlider),
+    highCutSliderAttachment(audioProcessor.apvts, "High Freq", highCutSlider),
+    mixFilterSliderAttachment(audioProcessor.apvts, "Filter Mix", mixFilterSlider)
 {
 
     delaySlider.setMarks({"0.1s", "2s"});
@@ -125,9 +128,9 @@ void TukTukyAudioProcessorEditor::resized()
     auto lowLabelArea = lowArea.removeFromRight(lowArea.getWidth() * 0.5f);
     auto highLabelArea = highArea.removeFromLeft(highArea.getWidth() * 0.5f);
     auto filterLabelArea = secondArea.removeFromRight(secondArea.getWidth() * 0.5f);
-    setLabel(lowCutLabel, "LOW CUT", lowLabelArea.withY(lowLabelArea.getY() - lowLabelArea.getHeight() * 0.5f + 7.f));
+    /*setLabel(lowCutLabel, "LOW CUT", lowLabelArea.withY(lowLabelArea.getY() - lowLabelArea.getHeight() * 0.5f + 7.f));
     setLabel(highCutLabel, "HIGH CUT", highLabelArea.withY(highLabelArea.getY() - highLabelArea.getHeight() * 0.5f + 7.f));
-    setLabel(mixFilterLabel, "FILTER", filterLabelArea.withY(filterLabelArea.getY() -  filterLabelArea.getHeight() * 0.5f + 7.f));
+    setLabel(mixFilterLabel, "FILTER", filterLabelArea.withY(filterLabelArea.getY() -  filterLabelArea.getHeight() * 0.5f + 7.f));*/
 
 
     lowCutSlider.setBounds(lowArea);
