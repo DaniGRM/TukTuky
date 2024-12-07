@@ -258,8 +258,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout TukTukyAudioProcessor::creat
     layout.add(std::make_unique<juce::AudioParameterFloat>("Gain", "Gain", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 1.f));
 
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Low Freq", "Low Freq", juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 0.1f), 20.f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("High Freq", "High Freq", juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 0.1f), 20000.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Low Freq", "Low Freq", juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 0.25f), 20.f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("High Freq", "High Freq", juce::NormalisableRange<float>(20.f, 20000.f, 1.f, 0.25f), 20000.f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Filter Mix", "Filter Mix", juce::NormalisableRange<float>(0.f, 1.f, 0.05f, 1.f), 0.f));
 
     return layout;
